@@ -5,13 +5,9 @@
   "username": "admin",
   "password": "admin",
   "database": "mail-center",
-  "entities": [
-    "entity/*.ts"
-  ],
+  "entities": ["src/entity/*.entity.ts"],
   "migrationsTableName": "custom_migration_table",
-  "migrations": [
-    "src/database/migration/*.ts"
-  ],
+  "migrations": ["src/database/migration/*.ts"],
   "cli": {
     "migrationsDir": "src/database/migration"
   }

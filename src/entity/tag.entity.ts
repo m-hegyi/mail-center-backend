@@ -4,18 +4,25 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { Imap } from './imap.entity';
-import { Email } from './email.entity';
+import { Company } from './company.entity';
 
-@Entity('company')
-export class Company {
+@Entity()
+export class Tag {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'varchar', length: 256 })
+  @ManyToOne((type) => Company, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'company_id' })
+  company?: Company;
+
+  @Column({ length: 100 })
   name!: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
@@ -25,10 +32,4 @@ export class Company {
 
   @Column({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
-
-  @OneToMany((type) => Imap, (imap) => imap.company)
-  imaps?: Imap[];
-
-  @OneToMany((type) => Email, (email) => email.company)
-  emails?: Email[];
 }
