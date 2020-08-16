@@ -10,8 +10,14 @@ import {
 import { Company } from './company.entity';
 import { Imap } from './imap.entity';
 import { User } from './user.entity';
+import { EmailCategory } from './email-category.entity';
 
-@Entity()
+export enum EmailStatus {
+  NOT_SEEN = 'NOT_SEEN',
+  SEEN = 'SEEN',
+}
+
+@Entity({ name: 'email' })
 export class Email {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -30,11 +36,16 @@ export class Email {
   @Column({ name: 'remote_id', length: 100 })
   remoteId!: string;
 
-  // statusId
+  @Column({ type: 'enum', enum: EmailStatus, default: EmailStatus.NOT_SEEN })
+  status!: EmailStatus;
 
-  // categoryId
+  @ManyToOne((type) => EmailCategory, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'category_id' })
+  category?: EmailCategory | null;
 
-  // userID
   @ManyToOne((type) => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'user_id' })
   user?: User | null;
