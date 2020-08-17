@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { login } from '../../controller/admin.controller';
+import { AdminController } from '../../controller/admin.controller';
 
 let findOneMock = jest.fn();
 
@@ -27,18 +27,19 @@ beforeEach(() => {
 
 describe('Admin controller tests', () => {
   describe('Admin login function test', () => {
+    const controller = new AdminController();
     it('without user, password or both should response with 400 and invalid response', async () => {
-      await login(req, res);
+      await controller.login(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith('Invalid request!');
 
       req.body = { user: 'test' };
-      await login(req, res);
+      await controller.login(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith('Invalid request!');
 
       req.body = { password: 'test' };
-      await login(req, res);
+      await controller.login(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith('Invalid request!');
 
@@ -52,7 +53,7 @@ describe('Admin controller tests', () => {
         password: 'test',
       };
 
-      await login(req, res);
+      await controller.login(req, res);
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith('Invalid credentials!');
       expect(res.json).toHaveBeenCalledTimes(1);
@@ -68,7 +69,7 @@ describe('Admin controller tests', () => {
 
       findOneMock = jest.fn().mockReturnValue({ ...inputOptions });
 
-      await login(req, res);
+      await controller.login(req, res);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.status).toHaveBeenCalledTimes(1);
       expect(res.json).toHaveBeenCalledTimes(1);
