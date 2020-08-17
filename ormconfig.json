@@ -6,8 +6,10 @@
   "password": "admin",
   "database": "mail-center",
   "entities": ["src/entity/*.entity.ts"],
-  "migrationsTableName": "custom_migration_table",
+  "migrationsTableName": "migrations",
   "migrations": ["src/database/migration/*.ts"],
+  "seeds": ["src/database/seed/**/*{.ts,.js}"],
+  "factories": ["src/database/factory/**/*{.ts,.js}"],
   "cli": {
     "migrationsDir": "src/database/migration"
   }

@@ -1,8 +1,6 @@
 import express from 'express';
 import * as env from 'dotenv';
 import { createConnection, getRepository } from 'typeorm';
-import { Company } from './entity/company.entity';
-import { Imap } from './entity/imap.entity';
 import { UserPermission } from './entity/user-permission.entity';
 
 env.config();
