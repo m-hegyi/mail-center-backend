@@ -31,7 +31,10 @@
     "@types/faker": "^4.1.12",
     "@types/jest": "^26.0.10",
     "@types/node": "^14.0.27",
+    "@types/supertest": "^2.0.10",
+    "babel-preset-env": "^1.7.0",
     "jest": "^26.4.0",
+    "supertest": "^4.0.2",
     "ts-jest": "^26.2.0",
     "ts-node-dev": "^1.0.0-pre.56"
   }
