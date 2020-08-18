@@ -10,3 +10,5 @@ routes.post('/login', (req: Request, res: Response) => {
     return;
   }
 });
+
+export default routes;
