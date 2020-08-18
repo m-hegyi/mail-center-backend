@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
-import { login } from '../../controller/admin.controller';
+import { login, create } from '../../controller/admin.controller';
 
 let findOneMock = jest.fn();
+let saveMock = jest.fn();
 
 jest.mock('typeorm', () => ({
   getRepository: () => ({
     findOne: findOneMock,
+    save: saveMock,
   }),
   PrimaryGeneratedColumn: jest.fn(),
   Entity: jest.fn(),
@@ -32,6 +34,7 @@ beforeEach(() => {
   res.json = jest.fn().mockReturnValue(res);
   res.cookie = jest.fn().mockReturnValue(res);
   findOneMock = jest.fn();
+  saveMock = jest.fn();
 });
 
 describe('Admin controller tests', () => {
@@ -113,6 +116,89 @@ describe('Admin controller tests', () => {
         },
         { httpOnly: true, maxAge: 1800 * 1000 },
       );
+    });
+  });
+
+  describe('Admin create function test', () => {
+    it('Create a valid admin with username and password', async () => {
+      const admin = {
+        name: 'test',
+        password: 'test',
+      };
+
+      req.body = admin;
+
+      saveMock = jest.fn().mockReturnValue(Promise.resolve({ ...admin }));
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(200);
+      expect(res.status).toBeCalledTimes(1);
+      expect(res.json).toBeCalledWith({ ...admin });
+    });
+
+    it('Trying to create an admin without name', async () => {
+      const admin = {
+        password: 'test',
+      };
+
+      req.body = admin;
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(400);
+      expect(res.status).toBeCalledTimes(1);
+      expect(res.json).toBeCalledWith({
+        invalidFields: ['name'],
+        msg: 'Invalid input(s)!',
+      });
+    });
+
+    it('Trying to create an admin without password', async () => {
+      const admin = {
+        name: 'test',
+      };
+
+      req.body = admin;
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(400);
+      expect(res.status).toBeCalledTimes(1);
+      expect(res.json).toBeCalledWith({
+        invalidFields: ['password'],
+        msg: 'Invalid input(s)!',
+      });
+    });
+
+    it('Trying to create an admin without name and password', async () => {
+      const admin = {};
+
+      req.body = admin;
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(400);
+      expect(res.status).toBeCalledTimes(1);
+      expect(res.json).toBeCalledWith({
+        invalidFields: ['name', 'password'],
+        msg: 'Invalid input(s)!',
+      });
+    });
+
+    it('Trying to create an admin that already exists', async () => {
+      const admin = {
+        name: 'test',
+        password: 'test',
+      };
+
+      req.body = admin;
+
+      findOneMock = jest.fn().mockReturnValue({ ...admin });
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(400);
+      expect(res.status).toBeCalledTimes(1);
+      expect(res.json).toBeCalledWith({
+        invalidFields: ['name'],
+        msg: 'Admin already exists!',
+      });
     });
   });
 });

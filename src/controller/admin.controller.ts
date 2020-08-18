@@ -33,3 +33,45 @@ export const login = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const create = async (req: Request, res: Response) => {
+  const { name, password } = req.body;
+
+  const errors = [];
+  let hasError = false;
+
+  if (!name) {
+    hasError = true;
+    errors.push('name');
+  }
+
+  if (!password) {
+    hasError = true;
+    errors.push('password');
+  }
+
+  if (hasError) {
+    res.status(400).json({ invalidFields: errors, msg: 'Invalid input(s)!' });
+    return;
+  }
+
+  const adminRepository = getRepository(Admin);
+
+  const admin = await adminRepository.findOne({ where: { name } });
+
+  if (admin) {
+    res
+      .status(400)
+      .json({ invalidFields: ['name'], msg: 'Admin already exists!' });
+    return;
+  }
+
+  const newAdmin = new Admin();
+
+  newAdmin.name = name;
+  newAdmin.password = password;
+
+  await adminRepository.save(newAdmin);
+
+  res.status(200).json(newAdmin);
+};
