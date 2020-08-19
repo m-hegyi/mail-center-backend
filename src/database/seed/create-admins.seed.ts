@@ -6,7 +6,8 @@ import { IAdminFactoryContext } from '../factory/admin.factory';
 export default class CreateAdmins implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     await factory<Admin, IAdminFactoryContext>(Admin)({
-      name: 'test',
+      userName: 'test',
+      email: 'test@mycompany.com',
       password: 'test',
     }).create();
   }

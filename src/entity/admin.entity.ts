@@ -13,8 +13,11 @@ export class Admin {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ type: 'varchar', length: 100, name: 'user_name' })
+  userName!: string;
+
   @Column({ type: 'varchar', length: 100 })
-  name!: string;
+  email!: string;
 
   @Column()
   password!: string;

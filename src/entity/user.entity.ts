@@ -25,6 +25,9 @@ export class User {
   @JoinColumn({ name: 'role_id' })
   role?: UserRole;
 
+  @Column({ length: 100, name: 'user_name' })
+  userName!: string;
+
   @Column({ length: 100 })
   email!: string;
 
