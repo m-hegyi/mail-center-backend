@@ -11,7 +11,8 @@ export const login = async (req: Request, res: Response) => {
     res.status(400).json('Invalid request!');
     return;
   } else {
-    const admin = await getRepository(Admin).findOne({ where: { name } });
+    const adminRepository = await getRepository(Admin);
+    const admin = await adminRepository.findOne({ where: { name } });
 
     if (!admin) {
       res.status(401).json('Invalid credentials!');
@@ -23,6 +24,10 @@ export const login = async (req: Request, res: Response) => {
         res.status(401).json('Invalid credentials!');
         return;
       }
+
+      // handle admin last login
+      admin.lastLogin = new Date();
+      adminRepository.save(admin);
 
       const token = generateAccessToken(admin.id, admin.name);
       res.cookie('Access-Token', token, {

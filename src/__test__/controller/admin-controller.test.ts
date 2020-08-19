@@ -102,7 +102,12 @@ describe('Admin controller tests', () => {
 
       findOneMock = jest.fn().mockReturnValue({ ...dbResult });
 
+      const date = new Date();
+      saveMock = jest.fn(() => date);
+
       await login(req, res);
+      expect(saveMock).toHaveBeenCalledTimes(1);
+      expect(saveMock).toHaveReturnedWith(date);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.status).toHaveBeenCalledTimes(1);
       expect(res.json).toHaveBeenCalledTimes(1);
