@@ -5,14 +5,14 @@ import bcrypt from 'bcryptjs';
 import { generateAccessToken } from '../util';
 
 export const login = async (req: Request, res: Response) => {
-  const { name, password } = req.body;
+  const { userName, password } = req.body;
 
-  if (!name || !password) {
+  if (!userName || !password) {
     res.status(400).json('Invalid request!');
     return;
   } else {
     const adminRepository = await getRepository(Admin);
-    const admin = await adminRepository.findOne({ where: { name } });
+    const admin = await adminRepository.findOne({ where: { userName } });
 
     if (!admin) {
       res.status(401).json('Invalid credentials!');
@@ -29,7 +29,7 @@ export const login = async (req: Request, res: Response) => {
       admin.lastLogin = new Date();
       adminRepository.save(admin);
 
-      const token = generateAccessToken(admin.id, admin.name);
+      const token = generateAccessToken(admin.id, admin.userName);
       res.cookie('Access-Token', token, {
         maxAge: 1800 * 1000,
         httpOnly: true,
@@ -40,40 +40,48 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const create = async (req: Request, res: Response) => {
-  const { name, password } = req.body;
+  const { userName, email, password } = req.body;
 
-  const errors = [];
+  const invalidFields = [];
   let hasError = false;
 
-  if (!name) {
+  if (!userName) {
     hasError = true;
-    errors.push('name');
+    invalidFields.push('userName');
+  }
+
+  if (!email) {
+    hasError = true;
+    invalidFields.push('email');
   }
 
   if (!password) {
     hasError = true;
-    errors.push('password');
+    invalidFields.push('password');
   }
 
   if (hasError) {
-    res.status(400).json({ invalidFields: errors, msg: 'Invalid input(s)!' });
+    res.status(400).json({ invalidFields, msg: 'Invalid input(s)!' });
     return;
   }
 
   const adminRepository = getRepository(Admin);
 
-  const admin = await adminRepository.findOne({ where: { name } });
+  // todo email validation
+
+  const admin = await adminRepository.findOne({ where: { userName } });
 
   if (admin) {
     res
       .status(400)
-      .json({ invalidFields: ['name'], msg: 'Admin already exists!' });
+      .json({ invalidFields: ['userName'], msg: 'Admin already exists!' });
     return;
   }
 
   const newAdmin = new Admin();
 
-  newAdmin.name = name;
+  newAdmin.userName = userName;
+  newAdmin.email = email;
   newAdmin.password = password;
 
   await adminRepository.save(newAdmin);

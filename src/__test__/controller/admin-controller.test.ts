@@ -39,12 +39,12 @@ beforeEach(() => {
 
 describe('Admin controller tests', () => {
   describe('Admin login function test', () => {
-    it('without user, password or both should response with 400 and invalid response', async () => {
+    it('without user, email, password or both should response with 400 and invalid response', async () => {
       await login(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith('Invalid request!');
 
-      req.body = { user: 'test' };
+      req.body = { userName: 'test' };
       await login(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith('Invalid request!');
@@ -60,7 +60,7 @@ describe('Admin controller tests', () => {
 
     it('with correct data without user', async () => {
       req.body = {
-        name: 'test',
+        userName: 'test',
         password: 'test',
       };
 
@@ -73,7 +73,7 @@ describe('Admin controller tests', () => {
 
     it('with valid user but wrong password', async () => {
       const inputOptions = {
-        name: 'test',
+        userName: 'test',
         password: 'test',
       };
       req.body = inputOptions;
@@ -90,7 +90,7 @@ describe('Admin controller tests', () => {
 
     it('with correct data with user', async () => {
       const inputOptions = {
-        name: 'test',
+        userName: 'test',
         password: 'test',
       };
       req.body = inputOptions;
@@ -117,7 +117,7 @@ describe('Admin controller tests', () => {
         'Access-Token',
         {
           id: dbResult.id,
-          username: dbResult.name,
+          userName: dbResult.userName,
         },
         { httpOnly: true, maxAge: 1800 * 1000 },
       );
@@ -125,9 +125,10 @@ describe('Admin controller tests', () => {
   });
 
   describe('Admin create function test', () => {
-    it('Create a valid admin with username and password', async () => {
+    it('Create a valid admin with username, email and password', async () => {
       const admin = {
-        name: 'test',
+        userName: 'test',
+        email: 'test@mycompany.com',
         password: 'test',
       };
 
@@ -152,14 +153,15 @@ describe('Admin controller tests', () => {
       expect(res.status).toBeCalledWith(400);
       expect(res.status).toBeCalledTimes(1);
       expect(res.json).toBeCalledWith({
-        invalidFields: ['name'],
+        invalidFields: ['userName', 'email'],
         msg: 'Invalid input(s)!',
       });
     });
 
-    it('Trying to create an admin without password', async () => {
+    it('Trying to create an admin without email', async () => {
       const admin = {
-        name: 'test',
+        userName: 'test',
+        password: 'test',
       };
 
       req.body = admin;
@@ -168,12 +170,28 @@ describe('Admin controller tests', () => {
       expect(res.status).toBeCalledWith(400);
       expect(res.status).toBeCalledTimes(1);
       expect(res.json).toBeCalledWith({
-        invalidFields: ['password'],
+        invalidFields: ['email'],
         msg: 'Invalid input(s)!',
       });
     });
 
-    it('Trying to create an admin without name and password', async () => {
+    it('Trying to create an admin without password', async () => {
+      const admin = {
+        userName: 'test',
+      };
+
+      req.body = admin;
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(400);
+      expect(res.status).toBeCalledTimes(1);
+      expect(res.json).toBeCalledWith({
+        invalidFields: ['email', 'password'],
+        msg: 'Invalid input(s)!',
+      });
+    });
+
+    it('Trying to create an admin without name, email and password', async () => {
       const admin = {};
 
       req.body = admin;
@@ -182,14 +200,15 @@ describe('Admin controller tests', () => {
       expect(res.status).toBeCalledWith(400);
       expect(res.status).toBeCalledTimes(1);
       expect(res.json).toBeCalledWith({
-        invalidFields: ['name', 'password'],
+        invalidFields: ['userName', 'email', 'password'],
         msg: 'Invalid input(s)!',
       });
     });
 
     it('Trying to create an admin that already exists', async () => {
       const admin = {
-        name: 'test',
+        userName: 'test',
+        email: 'test@mycompany.com',
         password: 'test',
       };
 
@@ -201,8 +220,25 @@ describe('Admin controller tests', () => {
       expect(res.status).toBeCalledWith(400);
       expect(res.status).toBeCalledTimes(1);
       expect(res.json).toBeCalledWith({
-        invalidFields: ['name'],
+        invalidFields: ['userName'],
         msg: 'Admin already exists!',
+      });
+    });
+
+    it('Trying to creat an admin with invalid email format', async () => {
+      const admin = {
+        userName: 'test',
+        email: 'notanEmail.com@',
+        password: 'test',
+      };
+
+      req.body = admin;
+
+      await create(req, res);
+      expect(res.status).toBeCalledWith(400);
+      expect(res.json).toBeCalledWith({
+        invalidFields: ['email'],
+        msg: 'Invalid email format!',
       });
     });
   });

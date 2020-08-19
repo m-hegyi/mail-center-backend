@@ -6,10 +6,10 @@ jest.mock('jsonwebtoken', () => ({
 
 describe('util code tests', () => {
   it('generate an access token', () => {
-    const username = 'Béla';
+    const userName = 'Béla';
     const id = 1;
-    const token = generateAccessToken(id, username);
+    const token = generateAccessToken(id, userName);
 
-    expect(token).toStrictEqual({ id, username });
+    expect(token).toStrictEqual({ id, userName });
   });
 });
