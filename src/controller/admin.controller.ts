@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import { Admin } from '../entity/admin.entity';
 import { generateAccessToken } from '../util';
+import AdminService from '../service/admin.service';
 
 export const login = async (req: Request, res: Response) => {
   const { userName, password } = req.body;
@@ -12,23 +13,8 @@ export const login = async (req: Request, res: Response) => {
     res.status(400).json('Invalid request!');
     return;
   } else {
-    const adminRepository = await getRepository(Admin);
-    const admin = await adminRepository.findOne({ where: { userName } });
-
-    if (!admin) {
-      res.status(401).json('Invalid credentials!');
-      return;
-    } else {
-      const valid = await bcrypt.compare(password, admin.password);
-
-      if (!valid) {
-        res.status(401).json('Invalid credentials!');
-        return;
-      }
-
-      // handle admin last login
-      admin.lastLogin = new Date();
-      adminRepository.save(admin);
+    try {
+      const admin = await AdminService.tryAuth(userName, password);
 
       const token = generateAccessToken(admin.id, admin.userName);
       res.cookie('Access-Token', token, {
@@ -36,6 +22,9 @@ export const login = async (req: Request, res: Response) => {
         httpOnly: true,
       });
       res.status(200).json('OK');
+    } catch (err) {
+      res.status(401).json('Invalid credentials!');
+      return;
     }
   }
 };
@@ -66,8 +55,6 @@ export const create = async (req: Request, res: Response) => {
     return;
   }
 
-  const adminRepository = getRepository(Admin);
-
   if (!validator.isEmail(email)) {
     res
       .status(400)
@@ -75,22 +62,13 @@ export const create = async (req: Request, res: Response) => {
     return;
   }
 
-  const admin = await adminRepository.findOne({ where: { userName } });
-
-  if (admin) {
+  try {
+    const admin = await AdminService.create({ userName, email, password });
+    res.status(200).json(admin);
+  } catch (err) {
     res
       .status(400)
       .json({ invalidFields: ['userName'], msg: 'Admin already exists!' });
     return;
   }
-
-  const newAdmin = new Admin();
-
-  newAdmin.userName = userName;
-  newAdmin.email = email;
-  newAdmin.password = password;
-
-  await adminRepository.save(newAdmin);
-
-  res.status(200).json(newAdmin);
 };

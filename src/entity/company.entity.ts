@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Imap } from './imap.entity';
 import { Email } from './email.entity';
+import { CompanyData } from './company-data.entity';
 
 @Entity('company')
 export class Company {
@@ -31,4 +33,7 @@ export class Company {
 
   @OneToMany((type) => Email, (email) => email.company)
   emails?: Email[];
+
+  @OneToOne((type) => CompanyData, (companyData) => companyData.company)
+  companyData?: CompanyData;
 }
