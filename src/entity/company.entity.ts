@@ -34,6 +34,8 @@ export class Company {
   @OneToMany((type) => Email, (email) => email.company)
   emails?: Email[];
 
-  @OneToOne((type) => CompanyData, (companyData) => companyData.company)
+  @OneToOne((type) => CompanyData, (companyData) => companyData.company, {
+    cascade: true,
+  })
   companyData?: CompanyData;
 }

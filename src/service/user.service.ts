@@ -31,6 +31,7 @@ const create = async ({
 
   const user = new User();
 
+  user.company = company;
   user.userName = userName;
   user.email = email;
   user.password = password;
