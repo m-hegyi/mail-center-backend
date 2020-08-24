@@ -2,6 +2,7 @@ import Faker from 'faker';
 import { define } from 'typeorm-seeding';
 import { User } from '../../entity/user.entity';
 import { Company } from '../../entity/company.entity';
+import { UserRole } from '../../entity/user-role.entity';
 
 export interface IUserFactoryContext {
   company: Company;
@@ -9,6 +10,7 @@ export interface IUserFactoryContext {
   userName?: string;
   iconUrl?: string;
   password?: string;
+  roles: UserRole[];
 }
 
 define(User, (faker: typeof Faker, context?: IUserFactoryContext) => {
@@ -20,7 +22,9 @@ define(User, (faker: typeof Faker, context?: IUserFactoryContext) => {
   user.password = context?.password || faker.internet.password();
   user.company = context?.company;
   // @TODO
-  //user.role;
+  user.role =
+    context?.roles[Math.floor(Math.random() * (context?.roles.length - 1))] ||
+    undefined;
 
   return user;
 });
