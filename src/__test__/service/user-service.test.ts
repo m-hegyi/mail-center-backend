@@ -1,5 +1,7 @@
 import userService from '../../service/user.service';
 import { User } from '../../entity/user.entity';
+import { Company } from '../../entity/company.entity';
+import Faker from 'faker';
 
 let findOneMock = jest.fn();
 let saveMock = jest.fn();
@@ -27,20 +29,28 @@ beforeEach(() => {
 });
 
 const userProps = {
-  userName: 'test_user',
-  email: 'test@company.com',
-  password: 'test1234',
+  userName: Faker.internet.userName(),
+  email: Faker.internet.email(),
+  password: Faker.internet.password(),
+  companyId: Faker.random.number(),
 };
 
 describe('User service tests', () => {
   describe('User create tests', () => {
     it('Create an user with valid data', async () => {
-      findOneMock.mockReturnValueOnce(Promise.resolve(null));
+      findOneMock
+        .mockReturnValueOnce(Promise.resolve(null))
+        .mockReturnValueOnce(new Company());
 
       const user = await userService.create({ ...userProps });
       expect(user).toBeInstanceOf(User);
-      expect(findOneMock).toBeCalledTimes(1);
-      expect(findOneMock).toBeCalledWith({ email: userProps.email });
+      expect(findOneMock).toBeCalledTimes(2);
+      expect(findOneMock).toHaveBeenNthCalledWith(1, {
+        where: { email: userProps.email },
+      });
+      expect(findOneMock).toHaveBeenLastCalledWith({
+        where: { id: userProps.companyId },
+      });
       expect(saveMock).toBeCalledTimes(1);
       expect(user.userName).toEqual(userProps.userName);
       expect(user.email).toEqual(userProps.email);
@@ -61,7 +71,27 @@ describe('User service tests', () => {
       expect(error.message).toEqual('This email is already in use!');
       expect(saveMock).toBeCalledTimes(0);
       expect(findOneMock).toBeCalledTimes(1);
-      expect(findOneMock).toBeCalledWith({ email: userProps.email });
+      expect(findOneMock).toBeCalledWith({ where: { email: userProps.email } });
+    });
+
+    it('Create an user but the company is invalid', async () => {
+      findOneMock
+        .mockReturnValueOnce(Promise.resolve(null))
+        .mockReturnValueOnce(Promise.resolve(null));
+
+      let error;
+      try {
+        await userService.create({ ...userProps });
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toEqual('Not a valid company!');
+      expect(saveMock).toBeCalledTimes(0);
+      expect(findOneMock).toHaveBeenLastCalledWith({
+        where: { id: userProps.companyId },
+      });
     });
   });
 });
