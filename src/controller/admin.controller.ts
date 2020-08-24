@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { Admin } from '../entity/admin.entity';
 import bcrypt from 'bcryptjs';
+import validator from 'validator';
+import { Admin } from '../entity/admin.entity';
 import { generateAccessToken } from '../util';
 
 export const login = async (req: Request, res: Response) => {
@@ -67,7 +68,12 @@ export const create = async (req: Request, res: Response) => {
 
   const adminRepository = getRepository(Admin);
 
-  // todo email validation
+  if (!validator.isEmail(email)) {
+    res
+      .status(400)
+      .json({ invalidFields: ['email'], msg: 'Invalid email format!' });
+    return;
+  }
 
   const admin = await adminRepository.findOne({ where: { userName } });
 
