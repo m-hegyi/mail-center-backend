@@ -23,7 +23,7 @@ define(User, (faker: typeof Faker, context?: IUserFactoryContext) => {
   user.company = context?.company;
   // @TODO
   user.role =
-    context?.roles[Math.floor(Math.random() * (context?.roles.length - 1))] ||
+    context?.roles[Math.floor(Math.random() * context?.roles.length)] ||
     undefined;
 
   return user;

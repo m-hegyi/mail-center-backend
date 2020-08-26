@@ -5,7 +5,6 @@ import { ICompanyDataFactoryContext } from '../factory/company-data.factory';
 import { User } from '../../entity/user.entity';
 import { IUserFactoryContext } from '../factory/user.factory';
 import { UserRole } from '../../entity/user-role.entity';
-import { IUserRoleFactoryContext } from '../factory/user-role.factory';
 
 export default class CreateCompanyAndUsers implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
@@ -13,16 +12,7 @@ export default class CreateCompanyAndUsers implements Seeder {
       CompanyData,
     )().create();
 
-    const promises: Promise<UserRole>[] = [];
-
-    ['owner', 'administrator', 'user'].forEach((name) => {
-      const promise = factory<UserRole, IUserRoleFactoryContext>(UserRole)({
-        name,
-      }).create();
-      promises.push(promise);
-    });
-
-    const roles = await Promise.all(promises);
+    const roles = await connection.getRepository(UserRole).find();
 
     await factory<User, IUserFactoryContext>(User)({
       company: companyData.company,
