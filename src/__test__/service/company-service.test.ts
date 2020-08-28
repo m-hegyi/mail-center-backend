@@ -20,6 +20,7 @@ jest.mock('typeorm', () => ({
   OneToOne: jest.fn(),
   JoinColumn: jest.fn(),
   OneToMany: jest.fn(),
+  PrimaryColumn: jest.fn(),
 }));
 
 beforeEach(() => {

@@ -62,7 +62,6 @@ export const register = async (req: Request, res: Response) => {
     return;
   }
 
-  console.log(company);
   try {
     user = await userService.create({
       userName,
