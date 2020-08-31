@@ -1,20 +1,15 @@
 import adminService from '../../service/admin.service';
 import { Admin } from '../../entity/admin.entity';
+import * as typeorm from 'typeorm';
 
 let findOneMock = jest.fn();
 let saveMock = jest.fn();
 
-jest.mock('typeorm', () => ({
-  getRepository: () => ({
-    findOne: findOneMock,
-    save: saveMock,
-  }),
-  PrimaryGeneratedColumn: jest.fn(),
-  Entity: jest.fn(),
-  Column: jest.fn(),
-  CreateDateColumn: jest.fn(),
-  UpdateDateColumn: jest.fn(),
-  BeforeInsert: jest.fn(),
+const spyRepo: any = jest.spyOn(typeorm, 'getRepository');
+
+spyRepo.mockImplementation(() => ({
+  save: saveMock,
+  findOne: findOneMock,
 }));
 
 jest.mock('bcryptjs', () => ({

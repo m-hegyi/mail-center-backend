@@ -1,26 +1,16 @@
 import companyService from '../../service/company.service';
 import { Company } from '../../entity/company.entity';
 import { CompanyData } from '../../entity/company-data.entity';
+import * as typeorm from 'typeorm';
 
 let findOneMock = jest.fn();
 let saveMock = jest.fn();
 
-jest.mock('typeorm', () => ({
-  getRepository: () => ({
-    findOne: findOneMock,
-    save: saveMock,
-  }),
-  PrimaryGeneratedColumn: jest.fn(),
-  Entity: jest.fn(),
-  Column: jest.fn(),
-  CreateDateColumn: jest.fn(),
-  UpdateDateColumn: jest.fn(),
-  BeforeInsert: jest.fn(),
-  ManyToOne: jest.fn(),
-  OneToOne: jest.fn(),
-  JoinColumn: jest.fn(),
-  OneToMany: jest.fn(),
-  PrimaryColumn: jest.fn(),
+const spyRepo: any = jest.spyOn(typeorm, 'getRepository');
+
+spyRepo.mockImplementation(() => ({
+  save: saveMock,
+  findOne: findOneMock,
 }));
 
 beforeEach(() => {

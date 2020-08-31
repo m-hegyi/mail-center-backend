@@ -12,10 +12,6 @@ export class UserPermission {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne((type) => UserRole, { onDelete: 'SET NULL', eager: true })
-  @JoinColumn({ name: 'role_id' })
-  role!: UserRole | null;
-
   @Column()
   name!: string;
 
