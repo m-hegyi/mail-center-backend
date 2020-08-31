@@ -14,8 +14,7 @@ export const Entity = () => () => {};
 export const PrimaryColumn = () => () => {};
 export const BeforeInsert = () => () => {};
 export const getRepository = (test: string) => ({
-  findOne: () => {
-    console.log(test);
-  },
+  findOne: () => {},
+  find: () => {},
   save: () => {},
 });
