@@ -6,16 +6,28 @@ import { UserPermission } from '../../entity/user-permission.entity';
 
 let findMock = jest.fn();
 let findOneMock = jest.fn();
+let getOneMock = jest.fn();
+let whereMock = jest.fn(() => ({
+  getOne: getOneMock,
+}));
+
 const spyRepo: any = jest.spyOn(typeorm, 'getRepository');
 
 spyRepo.mockImplementation(() => ({
   find: findMock,
   findOne: findOneMock,
+  createQueryBuilder: () => ({
+    where: whereMock,
+  }),
 }));
 
 beforeEach(() => {
   findMock = jest.fn();
   findOneMock = jest.fn();
+  getOneMock = jest.fn();
+  whereMock = jest.fn(() => ({
+    getOne: getOneMock,
+  }));
 });
 
 const role1 = new UserRole();
@@ -121,6 +133,50 @@ describe('User rbac tests', () => {
 
       expect(findOneMock).toBeCalledTimes(1);
       expect(permission).toBeUndefined();
+    });
+    it('get permissions for one role', async () => {
+      const roleId = faker.random.number(3);
+      const permissions = await userRbacService.getRolePermissions(1);
+      fail('Not implemented!');
+    });
+    it('the role has a specific permission', async () => {
+      getOneMock.mockReturnValueOnce(Promise.resolve({}));
+      const roleId = faker.random.number(10000);
+      const permissionId = faker.random.number(10000);
+      const hasPermission = await userRbacService.hasPermission(
+        roleId,
+        permissionId,
+      );
+
+      expect(hasPermission).toEqual(true);
+      expect(getOneMock).toBeCalledTimes(1);
+      expect(whereMock).toBeCalledTimes(1);
+      expect(
+        whereMock,
+      ).toBeCalledWith(
+        'role_permission.permission_id = :permissionId OR role_permission.role_id = :roleId',
+        { permissionId, roleId },
+      );
+    });
+    it('specific permission is not in the role', async () => {
+      getOneMock.mockReturnValueOnce(Promise.resolve(undefined));
+
+      const roleId = faker.random.number(10000);
+      const permissionId = faker.random.number(10000);
+      const hasPermission = await userRbacService.hasPermission(
+        roleId,
+        permissionId,
+      );
+
+      expect(hasPermission).toEqual(false);
+      expect(getOneMock).toBeCalledTimes(1);
+      expect(whereMock).toBeCalledTimes(1);
+      expect(
+        whereMock,
+      ).toBeCalledWith(
+        'role_permission.permission_id = :permissionId OR role_permission.role_id = :roleId',
+        { permissionId, roleId },
+      );
     });
   });
 });

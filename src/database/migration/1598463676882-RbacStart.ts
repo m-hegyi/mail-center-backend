@@ -29,17 +29,19 @@ export class RbacStart1598463676882 implements MigrationInterface {
     ].forEach(([roleIndex, permissionIndex], index) => {
       rolePermissions.push({
         id: index + 1,
-        role: userRoles[roleIndex],
-        permission: userPermissions[permissionIndex],
+        role: { ...userRoles[roleIndex] },
+        permission: { ...userPermissions[permissionIndex] },
         createdAt: new Date(),
         modifiedAt: new Date(),
       });
     });
 
     await queryRunner.manager.getRepository(UserRole).insert(userRoles);
+
     await queryRunner.manager
       .getRepository(UserPermission)
       .insert(userPermissions);
+
     await queryRunner.manager
       .getRepository(RolePermission)
       .insert(rolePermissions);
