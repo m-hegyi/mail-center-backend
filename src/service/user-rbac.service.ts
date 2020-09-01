@@ -47,7 +47,9 @@ const getPermission = async (
   return permission;
 };
 
-const getRolePermissions = async (roleId: number): Promise<any> => {
+const getRolePermissions = async (
+  roleId: number,
+): Promise<UserPermission[]> => {
   const rolePermissionRepository = getRepository(RolePermission);
 
   const rolePerimssions = await rolePermissionRepository.find({

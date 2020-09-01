@@ -135,9 +135,32 @@ describe('User rbac tests', () => {
       expect(permission).toBeUndefined();
     });
     it('get permissions for one role', async () => {
-      const roleId = faker.random.number(3);
-      const permissions = await userRbacService.getRolePermissions(1);
-      fail('Not implemented!');
+      const roleMockId = faker.random.number(3);
+      const permissionMockId = faker.random.number(1000);
+      const permissonMockName = faker.random.word();
+      const permissionMockDesc = faker.random.word();
+      const returnMock = [
+        {
+          permission: {
+            id: permissionMockId,
+            name: permissonMockName,
+            description: permissionMockDesc,
+          } as UserPermission,
+        },
+      ];
+      findMock.mockReturnValueOnce(returnMock);
+      const permissions = await userRbacService.getRolePermissions(roleMockId);
+
+      expect(findMock).toBeCalledTimes(1);
+      expect(findMock).lastCalledWith({ where: { role: { id: roleMockId } } });
+      expect(permissions.length).toEqual(returnMock.length);
+      permissions.forEach((perm, index) => {
+        expect(perm.id).toEqual(returnMock[index].permission.id);
+        expect(perm.name).toEqual(returnMock[index].permission.name);
+        expect(perm.description).toEqual(
+          returnMock[index].permission.description,
+        );
+      });
     });
     it('the role has a specific permission', async () => {
       getOneMock.mockReturnValueOnce(Promise.resolve({}));
