@@ -118,6 +118,7 @@ describe('Admin controller tests', () => {
         {
           id: dbResult.id,
           userName: dbResult.userName,
+          mode: 'admin',
         },
         { httpOnly: true, maxAge: 1800 * 1000 },
       );

@@ -8,8 +8,9 @@ describe('util code tests', () => {
   it('generate an access token', () => {
     const userName = 'Béla';
     const id = 1;
-    const token = generateAccessToken(id, userName);
+    const mode = 'admin';
+    const token = generateAccessToken(id, userName, mode);
 
-    expect(token).toStrictEqual({ id, userName });
+    expect(token).toStrictEqual({ id, userName, mode });
   });
 });

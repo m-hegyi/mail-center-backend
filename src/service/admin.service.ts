@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 const tryAuth = async (userName: string, password: string) => {
   const adminRepository = getRepository(Admin);
 
-  const admin = await adminRepository.findOne({ where: userName });
+  const admin = await adminRepository.findOne({ where: { userName } });
 
   if (!admin) {
     throw new Error('Invalid credentials!');
@@ -36,7 +36,9 @@ const create = async ({
 }: ICreateAdminEntity): Promise<Admin> => {
   const adminRepository = getRepository(Admin);
 
-  const oldAdmin = await adminRepository.findOne({ where: userName });
+  const oldAdmin = await adminRepository.findOne({
+    where: { userName },
+  });
 
   if (oldAdmin) {
     throw new Error('Admin already exists!');

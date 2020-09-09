@@ -1,21 +1,24 @@
-import companyService from '../../service/company.service';
+import * as companyService from '../../service/company.service';
 import { Company } from '../../entity/company.entity';
 import { CompanyData } from '../../entity/company-data.entity';
 import * as typeorm from 'typeorm';
 
 let findOneMock = jest.fn();
 let saveMock = jest.fn();
+let findMock = jest.fn();
 
 const spyRepo: any = jest.spyOn(typeorm, 'getRepository');
 
 spyRepo.mockImplementation(() => ({
   save: saveMock,
   findOne: findOneMock,
+  find: findMock,
 }));
 
 beforeEach(() => {
   saveMock = jest.fn();
   findOneMock = jest.fn();
+  findMock = jest.fn();
 });
 
 const createCompanyProps = {
@@ -56,5 +59,13 @@ describe('Company service tests', () => {
     expect(findOneMock).toBeCalledTimes(1);
     expect(error).toBeInstanceOf(Error);
     expect(error).toEqual(new Error('Company already exists!'));
+  });
+
+  it('List all companies', async () => {
+    findMock.mockReturnValueOnce([]);
+
+    const companies = await companyService.listAll();
+
+    expect(findMock).toBeCalledTimes(1);
   });
 });

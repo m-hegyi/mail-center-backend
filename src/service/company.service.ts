@@ -1,6 +1,6 @@
 import { Company } from '../entity/company.entity';
 import { CompanyData } from '../entity/company-data.entity';
-import { getRepository, getManager } from 'typeorm';
+import { getRepository } from 'typeorm';
 
 interface ICreateCompany {
   name: string;
@@ -9,7 +9,7 @@ interface ICreateCompany {
   billNumber: string;
 }
 
-const create = async ({
+export const create = async ({
   name,
   contactEmail,
   address,
@@ -38,6 +38,18 @@ const create = async ({
   return company;
 };
 
-export default {
-  create,
+export const listAll = async (): Promise<Company[]> => {
+  const companyRepository = await getRepository(Company);
+
+  return await companyRepository.find({ relations: ['companyData'] });
+};
+
+export const listOne = async (
+  companyId: number,
+): Promise<Company | undefined> => {
+  const companyRepository = await getRepository(Company);
+
+  return await companyRepository.findOne(companyId, {
+    relations: ['companyData'],
+  });
 };
